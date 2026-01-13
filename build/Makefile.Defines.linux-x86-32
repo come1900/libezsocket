@@ -1,0 +1,39 @@
+#-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+#
+# Makefile - /home/wujj/src/libs
+# Copyright (C) 2005 dahua Technologies, All Rights Reserved.
+# $Id: Makefile, v 1.0.0.1 2008-6-7 13:49:25 WuJunjie Exp $
+#
+# multi platform makefile
+#
+# Update:
+# 	2008-6-7 13:49:25 WuJunjie 10221 Create
+# 
+#-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+CC      = gcc
+CPP     = g++
+CXX     = g++
+LD      = ld
+AR      = ar
+RANLIB  = ranlib
+
+AR_FLAG = cru
+
+CFLAGS +=	-Wall -g $(INCLUDE) -MD -D_VERSION='"$(VERSION)"'
+
+# turn off optimization if compiling with gcc 2.9.x:
+#CFLAGS +=	-O0
+#-m32
+CFLAGS +=	-O2 -m32
+
+
+# uncomment depending on your operating system
+CFLAGS +=	-DLINUX
+
+LIBS +=		\
+		-lssl -lcrypto \
+		-lpthread
+
+#OBJS +=		Semaphore.o
+

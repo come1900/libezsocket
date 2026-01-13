@@ -1,0 +1,60 @@
+CHANGELOG (notable new features or fixes)
+
+7.2.0
+======================
+New devices: Samsung Galaxy Ace, Mini, and Epic. LGE Optimus Black, 3D, Hub,
+Pro, Sol, and One. Motorola Atrix. Sony Ericsson Xperia Live, Pro, and Active.
+Huawei U8150
+Common: Updated translations - (everyone)
+Common: T9 predictive Phone dialer - Danesh M, Pawit Pornkitprasan
+Common: Media player and recorder fixes for a number of corner cases - CAF,
+Danny Baumann
+Common: Profile resets - Ladios Jonquil
+Common: Assorted Wifi fixes
+OMAP Common: Support for recent OMAP3/OMAP4 devices - omapzoom
+Common: Control haptic in quiet hours - Danesh M
+Common: Lockscreen updates and new styles - Andrew Sutherland, Danny Baumann,
+Danesh M, Sven Dawitz, Taichi Nishimura
+Common: Bluetooth MAP support - Jonathan Bensen
+Common: ICS telephony fix backports - Spencer Oliver
+Common: Support for Bluetooth GPS dongles - Cuong Bui
+Common: Better support for mouse and usb keyboards - Emilio Lopez, Tanguy
+Pruvot
+Common: Fix timezone detection in Hawaii - Warren Togami
+Common: ICS Transition effects backport - Russ Underhill
+Common: ICS Rotation effects backport - Tanguy Pruvot
+Common: Allow photo storage selection when possible - Greg Kochaniak
+Common: Improved Calendar reminder options - Danny Baumann
+Common: Fix color banding in Gallery while displaying 32bpp images - Sang Tae
+Park
+Common: ADB over network
+Common: Improved AVRCP 1.3 compatibility
+Common: Improved external keyboard and mouse behaviour on some corner cases -
+Tanguy Pruvot
+Common: Status bar battery icon configuration - Simon Davie
+Samsung Galaxy S GSM devices: Fix emergency dialing
+p990: Add FM Radio support
+p990/p999: fix background calls, fix HDMI output in 1080p
+zeppelin, morrison, motus: Fixed camera zooming issues
+Samsung Galaxy S devices: Add tv-out
+Several devices: Fix device identification on Android Market
+crespo, jordan, blade, v9, Samsung Galaxy S devices: Device specific settings
+section
+
+7.1.0
+======================
+Common: Android 2.3.7 (Google)
+Common: Bluetooth mouse support - Scott Brady
+Common: Improve notification swipe-to-clear - Evan Charlton
+Common: Improve album-artist support in media scanner - Paul Crovella
+Common: Profile improvements and bugfixes - Martin Long, Danny Baumann, Robert
+Burns
+Common: RTL text improvements - Eyad Aboulouz, Eran Mizrahi
+Common: Wake on volume key option - Sven Dawitz
+Common: Support for revoking application permissions - Plamen K. Kosseff
+Common: Latest Superuser app - ChainsDD
+Common: Control brightness by sliding on statusbar - Danesh M
+Common: Add "copy all" to context menu - Danesh M
+Common: Lockscreen haptic and statusbar indicators toggle - Danesh M
+Common: Nicer timepicker/datepicker - Jiri Tyr
+

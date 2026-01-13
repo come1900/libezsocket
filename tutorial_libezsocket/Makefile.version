@@ -1,0 +1,28 @@
+#/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#/*
+# * Makefile - _explain_
+# *
+# Copyright (C) 2012  WuJunjie(Joy.Woo@hotmail.com)
+# *
+# * $Id: Makefile, v 1.0.0.1 2004-10-21 10:20 wjj Exp $
+# *
+# * _detail_explain_.
+# *  pub def for cross compile
+# *
+# */
+#/*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
+CLEAN_FILES = $(DIST) *.o *.gdb *.d *.cfbk *.tgz
+
+.c.o:
+	$(CC) -c $(CFLAGS) $< -o $@
+
+.cpp.o:
+	$(CPP) -c $(CFLAGS) $< -o $@
+
+all: $(DIST)
+
+clean: 
+	rm -f $(CLEAN_FILES)
+
+#$(DEPOBJS) = #

@@ -1,0 +1,8 @@
+TODO (notable new features or fixes)
+
+7.2.0
+======================
+(A): task 1 Level A 2013-07-04 10:41:13
+(A): task 2 Level A 2013-07-04 10:41:15
+(B): task 1 Level A 2013-07-04 10:41:17
+

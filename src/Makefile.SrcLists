@@ -1,0 +1,28 @@
+
+ifndef PREFIX_BASEDIR_SRC
+PREFIX_BASEDIR_SRC = .
+endif
+
+LIB_OBJS =      \
+		$(PREFIX_BASEDIR_SRC)/ez_error.o \
+		$(PREFIX_BASEDIR_SRC)/ez_raw.o \
+		$(PREFIX_BASEDIR_SRC)/ez_sockaddr.o \
+		$(PREFIX_BASEDIR_SRC)/ez_socket.o	\
+		$(PREFIX_BASEDIR_SRC)/ez_stdlib.o	\
+		$(PREFIX_BASEDIR_SRC)/ez_tcp.o \
+		$(PREFIX_BASEDIR_SRC)/ez_thread.o	\
+		$(PREFIX_BASEDIR_SRC)/ez_udp.o \
+		$(PREFIX_BASEDIR_SRC)/ez_http.o \
+		$(PREFIX_BASEDIR_SRC)/ez_util.o
+
+LIB_SRCS =      \
+		$(PREFIX_BASEDIR_SRC)/ez_error.c \
+		$(PREFIX_BASEDIR_SRC)/ez_raw.c \
+		$(PREFIX_BASEDIR_SRC)/ez_sockaddr.c \
+		$(PREFIX_BASEDIR_SRC)/ez_socket.c	\
+		$(PREFIX_BASEDIR_SRC)/ez_stdlib.c	\
+		$(PREFIX_BASEDIR_SRC)/ez_tcp.c \
+		$(PREFIX_BASEDIR_SRC)/ez_thread.c	\
+		$(PREFIX_BASEDIR_SRC)/ez_udp.c \
+		$(PREFIX_BASEDIR_SRC)/ez_http.c \
+		$(PREFIX_BASEDIR_SRC)/ez_util.c

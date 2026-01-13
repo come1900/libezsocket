@@ -1,0 +1,44 @@
+#-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+#
+# Makefile.Defines.linux-hi3515 - Z:\Librarys\Libs\src_ezutil\
+#
+# Copyright (C) 2010 QiYang Technologies, All Rights Reserved.
+#
+# $Id: Makefile.Defines.linux-hi3515 1 2010-06-23 06:45:58 WuJunjie Exp $
+#
+# explain
+#      exp
+#
+# Update:
+# 	   2010-06-23 06:45 WuJunjie Create
+# 
+#-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+CROSS	=   arm_v5t_le-
+CC      = $(CROSS)gcc
+CPP     = $(CROSS)g++
+CXX     = $(CROSS)g++
+LD      = $(CROSS)ld
+AR      = $(CROSS)ar
+RANLIB  = $(CROSS)ranlib
+STRIP	= $(CROSS)strip
+
+AR_FLAG = cru
+
+CFLAGS += -D_REENTRANT -DLINUX -Wall -O2 -Os -Wcast-qual -Wcast-align -mlong-calls 
+
+CFLAGS  += -fomit-frame-pointer
+#CFLAGS	+= -Wstrict-prototypes
+
+CFLAGS  += $(INCLUDE)
+CFLAGS  += -D_VERSION='"$(VERSION)"'
+
+# uncomment depending on your operating system
+CFLAGS +=	-DLINUX
+CFLAGS +=       -DLINUX_DM365
+
+LIBS +=		\
+		-lssl -lcrypto \
+		-lpthread
+
+#OBJS +=		Semaphore.o
+
