@@ -13,7 +13,10 @@ LIB_OBJS =      \
 		$(PREFIX_BASEDIR_SRC)/ez_thread.o	\
 		$(PREFIX_BASEDIR_SRC)/ez_udp.o \
 		$(PREFIX_BASEDIR_SRC)/ez_http.o \
-		$(PREFIX_BASEDIR_SRC)/ez_util.o
+		$(PREFIX_BASEDIR_SRC)/ez_util.o \
+		$(PREFIX_BASEDIR_SRC)/ez_wsclient-native.o \
+		$(PREFIX_BASEDIR_SRC)/ez_wsserver-native.o \
+		$(PREFIX_BASEDIR_SRC)/ez_websocket.o
 
 LIB_SRCS =      \
 		$(PREFIX_BASEDIR_SRC)/ez_error.c \
@@ -25,4 +28,7 @@ LIB_SRCS =      \
 		$(PREFIX_BASEDIR_SRC)/ez_thread.c	\
 		$(PREFIX_BASEDIR_SRC)/ez_udp.c \
 		$(PREFIX_BASEDIR_SRC)/ez_http.c \
-		$(PREFIX_BASEDIR_SRC)/ez_util.c
+		$(PREFIX_BASEDIR_SRC)/ez_util.c \
+		$(PREFIX_BASEDIR_SRC)/ez_wsclient-native.c \
+		$(PREFIX_BASEDIR_SRC)/ez_wsserver-native.c \
+		$(PREFIX_BASEDIR_SRC)/ez_websocket.c

@@ -27,8 +27,8 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <ez_url_parser.h>
-#include <ez_md5.h>
+#include <ezutil/ez_url_parser.h>
+#include <ezutil/ez_md5.h>
 
 #include	"ez_socket.h"
 
@@ -52,7 +52,7 @@
 
 #define ARG_USED(x) (void)&x;
 
-// ÄÚ²¿º¯Êý
+// ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½
 int get_pub_ip_from_mb(char *buf, size_t count);
 // 2012-2-23 8:34:33 qq's url not valid
 //int get_pub_ip_from_qq(char *pPubIP, size_t count);
@@ -60,15 +60,15 @@ int get_pub_ip_from_sina(char *pPubIP, size_t count);
 // 2014-09-05 14:17:28 replace by overhttp
 //int get_pub_ip_from_faceaip(char *pPubIP, size_t count);
 
-// pPubIP »º´æ»ñÈ¡µ½µÄ¹«Íøip
-// count »º´æ³¤¶È
-// pUrl ÍøÕ¾Á´½Ó
-// pPort »ñÈ¡¶Ë¿Ú
-// pLocation Ò³Ãæ
-// pSpliter ·Ö¸ô·û
-// SpliterLen ·Ö¸ô·û³¤¶È
-// pHttpBuffer http»º´æ
-// iBufLen »º´æ³¤¶È
+// pPubIP ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ä¹ï¿½ï¿½ï¿½ip
+// count ï¿½ï¿½ï¿½æ³¤ï¿½ï¿½
+// pUrl ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½
+// pPort ï¿½ï¿½È¡ï¿½Ë¿ï¿½
+// pLocation Ò³ï¿½ï¿½
+// pSpliter ï¿½Ö¸ï¿½ï¿½ï¿½
+// SpliterLen ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// pHttpBuffer httpï¿½ï¿½ï¿½ï¿½
+// iBufLen ï¿½ï¿½ï¿½æ³¤ï¿½ï¿½
 int get_pub_ip_over_http(char *pPubIP
                          , size_t count
                          , const char *pUrl
@@ -259,7 +259,7 @@ int get_pub_ip_from_mb(char *buf, size_t count)
 int get_pub_ip_from_sina(char *pPubIP, size_t count)
 {
 #if 1
-    // Ê¹ÓÃÓÅ»¯º¯Êý 2013-07-16 10:49:40
+    // Ê¹ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½ 2013-07-16 10:49:40
     char	 recvline[HTTP_STRING_LEN_SINA + 1];
     int iRet = -1;
 
@@ -273,7 +273,7 @@ int get_pub_ip_from_sina(char *pPubIP, size_t count)
                                 , sizeof (recvline)-1);
 
     return iRet;
-#else// Ê¹ÓÃ×Ô¶¨Òåº¯Êý
+#else// Ê¹ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½åº¯ï¿½ï¿½
 
     char	 recvline[HTTP_STRING_LEN_SINA + 1];
 
@@ -568,7 +568,7 @@ int ez_ivs_updateip(
     size_t count)
 {
     //char postline[HTTP_MAXSUB + 1];
-    // ¸ù¾ÝÊµ¼Ê¼ÆËã 151 ×óÓÒ
+    // ï¿½ï¿½ï¿½ï¿½Êµï¿½Ê¼ï¿½ï¿½ï¿½ 151 ï¿½ï¿½ï¿½ï¿½
 #define FACEAIP_POST_STRING_LEN 256
     char postline[FACEAIP_POST_STRING_LEN + 1];
 
@@ -658,8 +658,8 @@ int ez_get_ivs_service(
     size_t count)
 {
     ////////////////////////////////////////////////////
-    // ¼õÇá·þÎñÆ÷Ñ¹Á¦
-    int ret = -1;// Ä¬ÈÏÊ§°Ü
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½
+    int ret = -1;// Ä¬ï¿½ï¿½Ê§ï¿½ï¿½
     char strPubIP[64] = {0};
 
     //printf("__g_UpdateIP:%d\n", __g_UpdateIP);
@@ -817,7 +817,7 @@ int ez_rtsp_valid(const char *p_rtsp_url, int i_step)
 
             return em_ez_rtsp_valid_PlayUrlIPNotValid;
         }
-        // ´ËµØÖ·Ò²ÊÇÎÞÐ§
+        // ï¿½Ëµï¿½Ö·Ò²ï¿½ï¿½ï¿½ï¿½Ð§
         if (0 == strcasecmp(str_host, "0.0.0.0"))
         {
             DBG(
@@ -1062,7 +1062,7 @@ ssize_t ez_xml_post(ez_socket_t sockfd, const char *host, const char *page, cons
         }
 
         if(iFastMode==1
-           && n < HTTP_MAXSUB/*¼ÓÉÏÕâ¸öÈÃ¿ìËÙ·µ»Ø£¬ ²»±ØµÈ´ý³¬Ê±*/)
+           && n < HTTP_MAXSUB/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½Ù·ï¿½ï¿½Ø£ï¿½ ï¿½ï¿½ï¿½ØµÈ´ï¿½ï¿½ï¿½Ê±*/)
         {
             break;
         }
@@ -1398,12 +1398,12 @@ int ez_nvp_device_reg_2t(const char *p_reg_string, char *p_ret_session, char *p_
 /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 //
 /*inline */int ez_megaeye_GetMonitorPlayUrl(
-    const char *pHost    , /* Á´Â·url£¬Ð­Òé://ip:port£¬ÀýÈç£ºrtsp://192.168.5.66:554                 */
-    const char *pPort    , /* Á´Â·url£¬Ð­Òé://ip:port£¬ÀýÈç£ºrtsp://192.168.5.66:554                 */
-    const char *pAccount , /* ÕËºÅ¡¢ÓÃ»§Ãû                                                           */
-    const char *pPasswd  , /* ÃÜÂë                                                                   */
-    const char *pChannel , /* Í¨µÀºÅ, IDºÅ                                                           */
-    char       *pPlayUrl   /* ÂëÁ÷ÀàÐÍ£¬Ö÷ÂëÁ÷Îª0£¨¼´subtype=0£©£¬¸¨ÂëÁ÷Îª1£¨¼´subtype=1£©£¬ÒÔ´ËÀàÍÆ */
+    const char *pHost    , /* ï¿½ï¿½Â·urlï¿½ï¿½Ð­ï¿½ï¿½://ip:portï¿½ï¿½ï¿½ï¿½ï¿½ç£ºrtsp://192.168.5.66:554                 */
+    const char *pPort    , /* ï¿½ï¿½Â·urlï¿½ï¿½Ð­ï¿½ï¿½://ip:portï¿½ï¿½ï¿½ï¿½ï¿½ç£ºrtsp://192.168.5.66:554                 */
+    const char *pAccount , /* ï¿½ËºÅ¡ï¿½ï¿½Ã»ï¿½ï¿½ï¿½                                                           */
+    const char *pPasswd  , /* ï¿½ï¿½ï¿½ï¿½                                                                   */
+    const char *pChannel , /* Í¨ï¿½ï¿½ï¿½ï¿½, IDï¿½ï¿½                                                           */
+    char       *pPlayUrl   /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0ï¿½ï¿½ï¿½ï¿½subtype=0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª1ï¿½ï¿½ï¿½ï¿½subtype=1ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ */
 )
 {
     int iret = 9999;
@@ -1522,7 +1522,7 @@ DBG(
                 iret = -103;
                 break;
             }
-            // ½ØÖÁ
+            // ï¿½ï¿½ï¿½ï¿½
             code_end[0] = '\0';
 
             strcpy(pPlayUrl, code);
@@ -1550,28 +1550,28 @@ DBG(
 }
 
 /*inline */int ez_onvif_GetMonitorPlayUrl(
-    const char *pHost    , /* Á´Â·url£¬Ð­Òé://ip:port£¬ÀýÈç£ºrtsp://192.168.5.66:554                 */
-    const char *pPort    , /* Á´Â·url£¬Ð­Òé://ip:port£¬ÀýÈç£ºrtsp://192.168.5.66:554                 */
-    const char *pAccount , /* ÕËºÅ¡¢ÓÃ»§Ãû                                                           */
-    const char *pPasswd  , /* ÃÜÂë                                                                   */
-    const char *pChannel , /* Í¨µÀºÅ, IDºÅ                                                           */
-    char       *pPlayUrl   /* ÂëÁ÷ÀàÐÍ£¬Ö÷ÂëÁ÷Îª0£¨¼´subtype=0£©£¬¸¨ÂëÁ÷Îª1£¨¼´subtype=1£©£¬ÒÔ´ËÀàÍÆ */
+    const char *pHost    , /* ï¿½ï¿½Â·urlï¿½ï¿½Ð­ï¿½ï¿½://ip:portï¿½ï¿½ï¿½ï¿½ï¿½ç£ºrtsp://192.168.5.66:554                 */
+    const char *pPort    , /* ï¿½ï¿½Â·urlï¿½ï¿½Ð­ï¿½ï¿½://ip:portï¿½ï¿½ï¿½ï¿½ï¿½ç£ºrtsp://192.168.5.66:554                 */
+    const char *pAccount , /* ï¿½ËºÅ¡ï¿½ï¿½Ã»ï¿½ï¿½ï¿½                                                           */
+    const char *pPasswd  , /* ï¿½ï¿½ï¿½ï¿½                                                                   */
+    const char *pChannel , /* Í¨ï¿½ï¿½ï¿½ï¿½, IDï¿½ï¿½                                                           */
+    char       *pPlayUrl   /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0ï¿½ï¿½ï¿½ï¿½subtype=0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª1ï¿½ï¿½ï¿½ï¿½subtype=1ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ */
 )
 {
     return -1;
 }
 int ez_getStreamPlayUrl(
-    const int iType      , /* Á÷ÀàÐÍ£¬´úºÅ¶¨Òå£º1-Á÷Ã½Ìå  2-º£¿µIPC 3-´ó»ªIPC  ezDef_StreamType_     */
-    const char *pUrl     , /* Á´Â·url£¬Ð­Òé://ip:port£¬ÀýÈç£ºrtsp://192.168.5.66:554                 */
-    const char *pAccount , /* ÕËºÅ¡¢ÓÃ»§Ãû                                                           */
-    const char *pPasswd  , /* ÃÜÂë                                                                   */
-    const char *pChannel , /* Í¨µÀºÅ, IDºÅ                                                           */
-    const char *pSubtype , /* ÂëÁ÷ÀàÐÍ£¬Ö÷ÂëÁ÷Îª0£¨¼´subtype=0£©£¬¸¨ÂëÁ÷Îª1£¨¼´subtype=1£©£¬ÒÔ´ËÀàÍÆ */
-    char       *pPlayUrl , /* ÂëÁ÷ÀàÐÍ£¬Ö÷ÂëÁ÷Îª0£¨¼´subtype=0£©£¬¸¨ÂëÁ÷Îª1£¨¼´subtype=1£©£¬ÒÔ´ËÀàÍÆ */
+    const int iType      , /* ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½Å¶ï¿½ï¿½å£º1-ï¿½ï¿½Ã½ï¿½ï¿½  2-ï¿½ï¿½ï¿½ï¿½IPC 3-ï¿½ï¿½IPC  ezDef_StreamType_     */
+    const char *pUrl     , /* ï¿½ï¿½Â·urlï¿½ï¿½Ð­ï¿½ï¿½://ip:portï¿½ï¿½ï¿½ï¿½ï¿½ç£ºrtsp://192.168.5.66:554                 */
+    const char *pAccount , /* ï¿½ËºÅ¡ï¿½ï¿½Ã»ï¿½ï¿½ï¿½                                                           */
+    const char *pPasswd  , /* ï¿½ï¿½ï¿½ï¿½                                                                   */
+    const char *pChannel , /* Í¨ï¿½ï¿½ï¿½ï¿½, IDï¿½ï¿½                                                           */
+    const char *pSubtype , /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0ï¿½ï¿½ï¿½ï¿½subtype=0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª1ï¿½ï¿½ï¿½ï¿½subtype=1ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    char       *pPlayUrl , /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0ï¿½ï¿½ï¿½ï¿½subtype=0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª1ï¿½ï¿½ï¿½ï¿½subtype=1ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ */
     const size_t PlayUrlBufLen
 )
 {
-    //±ØÐë²ÎÊý
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     if (pPlayUrl==NULL)
     {
         return -1;
@@ -1581,7 +1581,7 @@ int ez_getStreamPlayUrl(
     int iret = 0;
 
     char *__phost = NULL;
-    char *__pport = NULL;//·ÀÖ¹ºóÃæÖ±½ÓÓÃparsed_url->port ¹Òµô
+    char *__pport = NULL;//ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½parsed_url->port ï¿½Òµï¿½
     int __port_http = 0;
     int __port_rtsp = 0;
 
@@ -1639,7 +1639,7 @@ int ez_getStreamPlayUrl(
             }
             else if (!strcasecmp(parsed_url->scheme, "pss"))
             {
-                // ·ÀÖ¹£ºpss://192.168.5.66:18088?http=80&rtsp=554
+                // ï¿½ï¿½Ö¹ï¿½ï¿½pss://192.168.5.66:18088?http=80&rtsp=554
                 if (NULL == parsed_url->path
                     || NULL == parsed_url->query)
                 {
@@ -1671,7 +1671,7 @@ int ez_getStreamPlayUrl(
         while(0);
     }
 
-    //ÄÚ²¿²»ÒªÖ±½Ó·µ»Ø£¬ ×îºóÐèÒªÊÍ·Å×ÊÔ´
+    //ï¿½Ú²ï¿½ï¿½ï¿½ÒªÖ±ï¿½Ó·ï¿½ï¿½Ø£ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Í·ï¿½ï¿½ï¿½Ô´
     switch ( iType )
     {
         case ezDef_StreamType_Streamming:
@@ -1739,7 +1739,7 @@ int ez_getStreamPlayUrl(
                     , __phost
                     , __port_rtsp
                     , pChannel
-                    , iSubStream-1 /*È¡ÓÃ×ÓÂëÁ÷ºÍÖ÷ÂëÁ÷*/
+                    , iSubStream-1 /*È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
                     , pAccount
                     , pPasswd
                    );
@@ -1769,7 +1769,7 @@ int ez_getStreamPlayUrl(
                     , __phost
                     , __port_rtsp
                     , iChn
-                    , iSubStream-1/*>2?1:0*//*È¡ÓÃ×ÓÂëÁ÷ºÍÖ÷ÂëÁ÷*/);
+                    , iSubStream-1/*>2?1:0*//*È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/);
 
             iret = 0;
             break;
@@ -1836,7 +1836,7 @@ DBG(
 
             break;
         }
-        // î£Ó±
+        // ï¿½Ó±
         //0--rtsp://221.226.192.193:7554/dev=JXJ-IPC-00000000/media=0/channel=0&level=0
         //1--rtsp://221.226.192.193:7554/dev=JXJ-IPC-00000000/media=0/channel=0&level=1
         case ezDef_StreamType_IPC_ryht:
@@ -1861,12 +1861,12 @@ DBG(
                     , __phost
                     , __port_rtsp
                     , iChn-1//
-                    , iSubStream-1/*>2?1:0*//*È¡ÓÃ×ÓÂëÁ÷ºÍÖ÷ÂëÁ÷*/);
+                    , iSubStream-1/*>2?1:0*//*È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/);
 
             iret = 0;
             break;
         }
-        // ÐÛÂõ
+        // ï¿½ï¿½ï¿½ï¿½
         // rtsp://192.168.5.74:554/user=admin_password=tlJwpbo6_channel=1_stream=0.sdp?real_stream
         // rtsp://192.168.5.74:554/user=admin_password=tlJwpbo6_channel=1_stream=1.sdp?real_stream
         case ezDef_StreamType_IPC_xm:
@@ -1891,7 +1891,7 @@ DBG(
                     , __phost
                     , __port_rtsp
                     , iChn//
-                    , iSubStream-1/*>2?1:0*//*È¡ÓÃ×ÓÂëÁ÷ºÍÖ÷ÂëÁ÷*/);
+                    , iSubStream-1/*>2?1:0*//*È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/);
 
             iret = 0;
             break;
@@ -1920,12 +1920,12 @@ DBG(
                     , pPasswd
                     , __phost
                     , __port_rtsp
-                    , iSubStream/*>2?1:0*//*È¡ÓÃ×ÓÂëÁ÷ºÍÖ÷ÂëÁ÷*/);
+                    , iSubStream/*>2?1:0*//*È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/);
 
             iret = 0;
             break;
         }
-        // ¼¯¹â
+        // ï¿½ï¿½ï¿½ï¿½
         //rtsp://vsa.shp.ezlibs.com:16368/id=1&type=0
         //rtsp://vsa.shp.ezlibs.com:16368/id=1&type=1
         case ezDef_StreamType_IPC_jiguang:
@@ -1950,7 +1950,7 @@ DBG(
                     , __phost
                     , __port_rtsp
                     , iChn
-                    , iSubStream-1/*>2?1:0*//*È¡ÓÃ×ÓÂëÁ÷ºÍÖ÷ÂëÁ÷*/);
+                    , iSubStream-1/*>2?1:0*//*È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/);
 
             iret = 0;
             break;
@@ -2099,7 +2099,7 @@ ssize_t ez_http_post_2(ez_socket_t sockfd
         }
 
         if(iFastMode==1
-           && n < HTTP_MAXSUB/*¼ÓÉÏÕâ¸öÈÃ¿ìËÙ·µ»Ø£¬ ²»±ØµÈ´ý³¬Ê±*/)
+           && n < HTTP_MAXSUB/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½Ù·ï¿½ï¿½Ø£ï¿½ ï¿½ï¿½ï¿½ØµÈ´ï¿½ï¿½ï¿½Ê±*/)
         {
             break;
         }

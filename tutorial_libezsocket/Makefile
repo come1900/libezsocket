@@ -9,6 +9,7 @@ PLATFORM = linux
 #PLATFORM = linux-hi3515
 #PLATFORM = linux-arm
 #PLATFORM = osx
+PLATFORM = linux-mipsel-openwrt-linux
 
 VERSION =	1.0
 DIFF_VERSION =	0.9
@@ -25,7 +26,10 @@ DIST =	get_pub_ip-$(PLATFORM) \
 	getPlayUrlMeye-$(PLATFORM) \
 	platform_chiper-$(PLATFORM)
 
-DIST += rtp_rcv_udp-$(PLATFORM)
+DIST += rtp_rcv_udp-$(PLATFORM) \
+	touch-cli-native-$(PLATFORM) \
+	touch-cli-native-multi-$(PLATFORM) \
+	touch-svr-native-$(PLATFORM)
 
 CFLAGS =	-Wall -g -O2 -MD
 CFLAGS += -D_DEBUG #debugme
@@ -36,7 +40,7 @@ include ../../Makefile.Defines/Makefile.Defines.$(PLATFORM)
 
 CLEAN_FILES += *actual* *rewrite* a.txt
 
-#ÌØÊâ¹¦ÄÜÇø
+#ï¿½ï¿½ï¿½â¹¦ï¿½ï¿½ï¿½ï¿½
 #
 
 CPPFLAGS =	$(CFLAGS) 
@@ -76,6 +80,12 @@ faceaip-$(PLATFORM):faceaip.o
 form_post_cli-$(PLATFORM):form_post_cli.o
 	$(CPP) -o $@ $^ $(LIBS)
 porsts_cli-$(PLATFORM):porsts_cli.o
+	$(CPP) -o $@ $^ $(LIBS)
+touch-cli-native-$(PLATFORM):touch-cli-native.o
+	$(CPP) -o $@ $^ $(LIBS)
+touch-cli-native-multi-$(PLATFORM):touch-cli-native-multi.o
+	$(CPP) -o $@ $^ $(LIBS)
+touch-svr-native-$(PLATFORM):touch-svr-native.o
 	$(CPP) -o $@ $^ $(LIBS)
 
 FILES =		*.h *.cpp Makefile*

@@ -19,8 +19,10 @@ include		$(PUB_MAKE_FILE_PREFIX)/Makefile.Batch.Build
 
 # define default platform
 ifndef PLATFORM
-PLATFORM = linux-x86-32
+PLATFORM = linux
 endif
+#PLATFORM = linux-mipsel-openwrt-linux
+
 VERSION="1.0.0"
 
 # CPP, CFLAGS, LIBS
@@ -31,7 +33,7 @@ include $(PREFIX_BASEDIR_SRC)/Makefile.SrcLists
 #		./src/api_exa.o
 
 EZLIBS_BASEDIR_LIBS=$(HOME)/libs
-CFLAGS += -I${EZLIBS_BASEDIR_LIBS}/include/ezutil
+CFLAGS += -I${EZLIBS_BASEDIR_LIBS}/include
 #LIBS += -L${EZLIBS_BASEDIR_LIBS}/lib -lezutil-$(PLATFORM)
 
 PREFIX =	$(HOME)/libs

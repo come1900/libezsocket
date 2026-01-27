@@ -47,7 +47,7 @@
 //def_rtsp_url_ipc
 //#define DEF_RTSP_URL "rtsp://61.160.149.159:18554/6fe237f5dd917e9b159dbcb9c1ecee705bc00c9e.sdp?s=a63d3c0edb2ad59c0f3ecad3216aeded1222316f"
 
-#include <ez_url_parser.h>
+#include <ezutil/ez_url_parser.h>
 #define DEF_THE_BUFF_LEN 2*1024
 #define DEF_TIMEOUT_SECOND 5*1000*1000
 
