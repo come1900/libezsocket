@@ -9,7 +9,7 @@ PLATFORM = linux
 #PLATFORM = linux-hi3515
 #PLATFORM = linux-arm
 #PLATFORM = osx
-PLATFORM = linux-mipsel-openwrt-linux
+#PLATFORM = linux-mipsel-openwrt-linux
 
 VERSION =	1.0
 DIFF_VERSION =	0.9
@@ -36,7 +36,7 @@ CFLAGS += -D_DEBUG #debugme
 
 #include         Makefile.version
 #include         ~/daily/src/library/Makefile.Defines/Makefile.Defines.$(PLATFORM)
-include ../../Makefile.Defines/Makefile.Defines.$(PLATFORM)
+include ../../lazaru/Makefile.Defines/Makefile.Defines.$(PLATFORM)
 
 CLEAN_FILES += *actual* *rewrite* a.txt
 

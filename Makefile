@@ -14,7 +14,7 @@
 #    2011-10-22 08:14 WuJunjie Create
 #
 #-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-PUB_MAKE_FILE_PREFIX =	../Makefile.Defines
+PUB_MAKE_FILE_PREFIX =	../lazaru/Makefile.Defines
 include		$(PUB_MAKE_FILE_PREFIX)/Makefile.Batch.Build
 
 # define default platform
