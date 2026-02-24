@@ -137,6 +137,18 @@ int ez_ws_server_get_client_count(struct ez_ws_server_handle *ws);
 int ez_ws_server_is_ready(struct ez_ws_server_handle *ws);
 
 /**
+ * 关闭指定客户端连接
+ * @param ws 服务端句柄
+ * @param client_id 客户端ID
+ * @return EZ_WS_SERVER_OK表示成功，其他值表示错误
+ *
+ * 说明：
+ *  - 该接口用于在应用层显式关闭某个客户端的 WebSocket 连接
+ *  - 关闭后会触发 on_disconnected 回调，并清理该客户端相关资源
+ */
+int ez_ws_server_close_client(struct ez_ws_server_handle *ws, int client_id);
+
+/**
  * 客户端信息结构（用于遍历客户端列表）
  */
 struct ez_ws_client_info {

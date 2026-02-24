@@ -1692,6 +1692,23 @@ int ez_ws_server_is_ready(struct ez_ws_server_handle *ws)
 	return ws->ready ? 1 : 0;
 }
 
+/* 关闭指定客户端连接 */
+int ez_ws_server_close_client(struct ez_ws_server_handle *ws, int client_id)
+{
+	if (!ws)
+		return EZ_WS_SERVER_ERR_INVALID_PARAM;
+	
+	/* 查找客户端 */
+	struct client_connection *client = find_client(ws, client_id);
+	if (!client)
+		return EZ_WS_SERVER_ERR_CLIENT_NOT_FOUND;
+	
+	/* 复用内部的 remove_client 逻辑，负责 epoll 注销、socket 关闭、回调和资源清理 */
+	remove_client(ws, client);
+	
+	return EZ_WS_SERVER_OK;
+}
+
 /* 遍历客户端 */
 int ez_ws_server_foreach_client(struct ez_ws_server_handle *ws,
                                  ez_ws_server_foreach_client_cb callback,
