@@ -222,7 +222,6 @@ struct ez_ws_server_handle {
 	struct client_connection *client_list;
 	pthread_mutex_t client_list_lock;
 	int client_count;
-	int next_client_id;
 	
 	/* 状态 */
 	int ready;
@@ -304,16 +303,14 @@ static int accept_new_connection(struct ez_ws_server_handle *server)
 	
 	/* 初始化客户端信息（calloc 已将所有字段初始化为0） */
 	client->client_info.connect_time = time(NULL);
-	
+
 	/* 获取客户端地址 */
 	inet_ntop(AF_INET, &client_addr.sin_addr, client->client_info.ip, sizeof(client->client_info.ip));
 	client->client_info.port = ntohs(client_addr.sin_port);
-	
-	/* 分配客户端 ID */
-	pthread_mutex_lock(&server->client_list_lock);
-	client->client_info.id = server->next_client_id++;
-	pthread_mutex_unlock(&server->client_list_lock);
-	
+
+	/* 使用 sockfd 作为客户端 ID（仅内部使用，不会溢出） */
+	client->client_info.id = client_sockfd;
+
 	/* 初始化发送队列锁 */
 	pthread_mutex_init(&client->send_queue_lock, NULL);
 	
@@ -405,14 +402,10 @@ static void remove_client(struct ez_ws_server_handle *server, struct client_conn
 {
 	if (!server || !client)
 		return;
-	
-	/* 从 epoll 中移除 */
-	epoll_ctl(server->epollfd, EPOLL_CTL_DEL, client->sockfd, NULL);
-	
-	/* 关闭 socket */
-	close(client->sockfd);
-	
-	/* 从客户端列表中移除 */
+
+	int saved_sockfd = client->sockfd;  /* 保存 sockfd，防止后续访问 */
+
+	/* 先从客户端列表中移除（防止 find_client 找到已断开的连接） */
 	pthread_mutex_lock(&server->client_list_lock);
 	if (server->client_list == client) {
 		server->client_list = client->next;
@@ -425,11 +418,14 @@ static void remove_client(struct ez_ws_server_handle *server, struct client_conn
 	}
 	server->client_count--;
 	pthread_mutex_unlock(&server->client_list_lock);
-	
-	/* 调用断开回调 */
+
+	/* 调用断开回调（在关闭 socket 之前通知上层） */
 	if (server->callbacks.on_disconnected) {
 		server->callbacks.on_disconnected(client->client_info.id, server->callbacks.user_data);
 	}
+
+	/* 关闭 socket（close 会自动从 epoll 中移除） */
+	close(saved_sockfd);
 	
 	/* 清理资源 */
 	SAFE_FREE(client->http_header_field);
@@ -438,6 +434,7 @@ static void remove_client(struct ez_ws_server_handle *server, struct client_conn
 	SAFE_FREE(client->http_sec_websocket_protocol);
 	SAFE_FREE(client->http_url_path);
 	SAFE_FREE(client->pending_send_data);
+	SAFE_FREE(client->current_frame.buffer);
 	SAFE_FREE(client->recv_buffer);
 	
 	/* 清理发送队列 */
@@ -897,13 +894,13 @@ static int on_ws_frame_complete(ez_websocket_parser *parser)
 #if defined(EZ_WS_SERVER_ENABLE_STATS) && (EZ_WS_SERVER_ENABLE_STATS == 1)
 		client->stats.rx_ping_count++;
 #endif /* EZ_WS_SERVER_ENABLE_STATS */
-		/* 收到 ping，发送 pong */
-		/* 注意：pong 的 payload 应该与 ping 的 payload 相同 */
-		/* 这里简化处理，发送空的 pong */
+		/* 收到 ping，发送 pong（RFC 6455 要求：Pong 必须原样返回 Ping 的 payload） */
 		{
-			uint8_t pong_frame[2];
+			uint8_t pong_frame[256];  /* 足够容纳常见的 ping payload */
 			size_t pong_len;
-			create_ws_frame_server(NULL, 0, EZ_WS_OPCODE_PONG, 1, pong_frame, &pong_len);
+			const uint8_t *ping_payload = client->current_frame.buffer;
+			size_t ping_payload_len = client->current_frame.buffer_size;
+			create_ws_frame_server(ping_payload, ping_payload_len, EZ_WS_OPCODE_PONG, 1, pong_frame, &pong_len);
 			send(client->sockfd, pong_frame, pong_len, 0);
 #if defined(EZ_WS_SERVER_ENABLE_STATS) && (EZ_WS_SERVER_ENABLE_STATS == 1)
 			client->stats.tx_pong_count++;
@@ -1489,7 +1486,6 @@ struct ez_ws_server_handle *ez_ws_server_handle_create(struct ez_ws_server_confi
 	pthread_mutex_init(&server->client_list_lock, NULL);
 	server->client_list = NULL;
 	server->client_count = 0;
-	server->next_client_id = 1;
 	
 	/* 创建监听 socket */
 	server->listen_sockfd = ez_websocket_create_listen_socket(server->config.ip, server->config.port);
@@ -1614,7 +1610,7 @@ int ez_ws_server_send_text(struct ez_ws_server_handle *ws, int client_id, const 
 		len = strlen(data);
 	
 	/* 广播到所有客户端 */
-	if (client_id == -1) {
+	if (client_id == EZ_WS_SERVER_BROADCAST_ALL) {
 		pthread_mutex_lock(&ws->client_list_lock);
 		struct client_connection *client = ws->client_list;
 		while (client) {
@@ -1626,15 +1622,15 @@ int ez_ws_server_send_text(struct ez_ws_server_handle *ws, int client_id, const 
 		pthread_mutex_unlock(&ws->client_list_lock);
 		return EZ_WS_SERVER_OK;
 	}
-	
+
 	/* 发送到指定客户端 */
 	struct client_connection *client = find_client(ws, client_id);
 	if (!client)
 		return EZ_WS_SERVER_ERR_CLIENT_NOT_FOUND;
-	
+
 	if (send_to_client_internal(client, (const uint8_t *)data, len, EZ_WS_OPCODE_TEXT) < 0)
 		return EZ_WS_SERVER_ERR_QUEUE_FULL;
-	
+
 	return EZ_WS_SERVER_OK;
 }
 
@@ -1643,9 +1639,9 @@ int ez_ws_server_send_binary(struct ez_ws_server_handle *ws, int client_id, cons
 {
 	if (!ws || !data || len == 0)
 		return EZ_WS_SERVER_ERR_INVALID_PARAM;
-	
+
 	/* 广播到所有客户端 */
-	if (client_id == -1) {
+	if (client_id == EZ_WS_SERVER_BROADCAST_ALL) {
 		pthread_mutex_lock(&ws->client_list_lock);
 		struct client_connection *client = ws->client_list;
 		while (client) {

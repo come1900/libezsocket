@@ -40,6 +40,10 @@ extern "C" {
 #define EZ_WS_SERVER_ERR_QUEUE_FULL    -4   /* 发送队列已满 */
 #define EZ_WS_SERVER_ERR_CLIENT_NOT_FOUND -5 /* 客户端未找到 */
 
+/* 客户端ID特殊值定义 */
+#define EZ_WS_SERVER_INVALID_CLIENT_ID  (-1)  /* 无效客户端ID */
+#define EZ_WS_SERVER_BROADCAST_ALL      (-1)  /* 广播到所有客户端 */
+
 /* WebSocket回调函数类型定义 */
 typedef void (*ez_ws_server_on_receive_cb)(int client_id, const void *data, size_t len, int is_binary, void *user_data);
 typedef void (*ez_ws_server_on_connected_cb)(int client_id, const char *ip, int port, void *user_data);
@@ -105,7 +109,7 @@ int ez_ws_server_service_exec(struct ez_ws_server_handle *ws, int timeout_ms);
 /**
  * 发送文本消息到指定客户端
  * @param ws 服务端句柄
- * @param client_id 客户端ID，-1表示广播到所有客户端
+ * @param client_id 客户端ID，EZ_WS_SERVER_BROADCAST_ALL表示广播到所有客户端
  * @param data 文本数据
  * @param len 数据长度，0表示自动计算（以\0结尾的字符串）
  * @return EZ_WS_SERVER_OK表示成功，其他值表示错误
@@ -115,7 +119,7 @@ int ez_ws_server_send_text(struct ez_ws_server_handle *ws, int client_id, const 
 /**
  * 发送二进制消息到指定客户端
  * @param ws 服务端句柄
- * @param client_id 客户端ID，-1表示广播到所有客户端
+ * @param client_id 客户端ID，EZ_WS_SERVER_BROADCAST_ALL表示广播到所有客户端
  * @param data 二进制数据
  * @param len 数据长度
  * @return EZ_WS_SERVER_OK表示成功，其他值表示错误
