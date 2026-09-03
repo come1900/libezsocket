@@ -1289,7 +1289,8 @@ static int process_events(struct ez_ws_server_handle *server, int timeout_ms)
 		return -1;
 	}
 	
-	for (int i = 0; i < nfds; i++) {
+        int i = 0;
+	for (i = 0; i < nfds; i++) {
 		if (events[i].data.fd == server->listen_sockfd) {
 			/* 新连接 - 使用 EPOLLET 边缘触发模式，只需接受一次 */
 			/* 如果还有更多连接，epoll 会再次触发事件 */

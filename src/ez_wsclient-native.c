@@ -21,7 +21,6 @@
 #define _GNU_SOURCE
 #endif
 
-#include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>
@@ -32,11 +31,15 @@
 #include <string.h>
 #include <strings.h>
 #include <sys/epoll.h>
-#include <sys/random.h>
 #include <sys/socket.h>
 #include <sys/timerfd.h>
 #include <time.h>
 #include <unistd.h>
+
+#define HAVE_GETRANDOM // 低版本linux中，注释掉这两行
+#include <sys/random.h>
+#include <arpa/inet.h>
+#include <netinet/tcp.h> 
 
 #include <ezutil/base64.h>
 #include <ezutil/ez_websocket_parser.h>
@@ -425,7 +428,51 @@ static int on_http_headers_complete(http_parser *parser) {
 	return 0;
 }
 
+// 如果系统没有 sys/random.h，我们手动定义标志位和函数
+#ifndef HAVE_GETRANDOM
 
+// 定义标志位（即使不使用，也要保证编译通过）
+#ifndef GRND_NONBLOCK
+#define GRND_NONBLOCK 0x0001
+#endif
+
+#ifndef GRND_RANDOM
+#define GRND_RANDOM 0x0002
+#endif
+
+/**
+ * 兼容旧版 glibc (如 CentOS 7) 的 getrandom 实现
+ * 内部使用 /dev/urandom 替代，/dev/urandom 本身就是非阻塞的
+ */
+static ssize_t getrandom(void *buf, size_t buflen, unsigned int flags) {
+    int fd;
+    ssize_t nread;
+    (void)flags; // 忽略 flags，因为 /dev/urandom 默认就是非阻塞的
+
+    fd = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
+    if (fd == -1) {
+        return -1;
+    }
+
+    // 循环读取，确保读取到指定长度的数据
+    size_t total_read = 0;
+    while (total_read < buflen) {
+        nread = read(fd, (char *)buf + total_read, buflen - total_read);
+        if (nread <= 0) {
+            if (errno == EINTR) {
+                continue; // 被信号中断，继续读取
+            }
+            close(fd);
+            return -1; // 读取失败
+        }
+        total_read += nread;
+    }
+
+    close(fd);
+    return (ssize_t)buflen;
+}
+
+#endif // HAVE_GETRANDOM
 
 /* 创建WebSocket帧 */
 static int create_ws_frame(const uint8_t *payload, size_t payload_len, 
@@ -471,7 +518,8 @@ static int create_ws_frame(const uint8_t *payload, size_t payload_len,
 	pos += 4;
 	
 	/* 应用mask并复制payload */
-	for (size_t i = 0; i < payload_len; i++) {
+        size_t i = 0;
+	for (i = 0; i < payload_len; i++) {
 		frame[pos + i] = payload[i] ^ masking_key[i % 4];
 	}
 	pos += payload_len;
@@ -706,7 +754,12 @@ static int ez_ws_connect(struct ez_ws_client_handle *ws) {
 	
 	/* 设置为非阻塞 */
 	ez_websocket_set_nonblocking(ws->sockfd);
-	
+
+	/* 禁用 Nagle 算法（降低延迟） */
+	int opt = 1;
+	if (setsockopt(ws->sockfd, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt)) < 0)
+		return -1;
+
 	/* 重置接收缓冲区和解析器 */
 	ws->recv_buffer_len = 0;
 	ez_websocket_parser_init(&ws->ws_parser);
@@ -1253,7 +1306,8 @@ int ez_ws_service_exec(struct ez_ws_client_handle *ws, int timeout_ms) {
 		return -1; /* 错误，停止 */
 	}
 	
-	for (int i = 0; i < nfds; i++) {
+        int i = 0;
+	for (i = 0; i < nfds; i++) {
 		if (events[i].data.fd == ws->sockfd) {
 			if (events[i].events & EPOLLIN) {
 				if (ws->state == EZ_WS_STATE_HANDSHAKING) {
