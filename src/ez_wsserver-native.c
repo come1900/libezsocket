@@ -1367,79 +1367,91 @@ static int process_events(struct ez_ws_server_handle *server, int timeout_ms)
 						continue;
 					}
 				} else if (client->state == CLIENT_STATE_CONNECTED) {
-					/* 接收 WebSocket 数据 */
-					/* 检查缓冲区空间是否足够 */
-					if (client->recv_buffer_len >= client->recv_buffer_size) {
-						/* 缓冲区已满，尝试扩展 */
-						if (client->recv_buffer_size >= EZ_WS_RECV_BUFFER_MAX_SIZE) {
-							/* 已达到最大限制，关闭连接 */
-							fprintf(stderr, "[ERROR] Recv buffer reached maximum size (%d bytes). "
-							        "Client #%d from %s:%d. Cannot receive more data.\n",
-							        EZ_WS_RECV_BUFFER_MAX_SIZE,
+					/* 接收 WebSocket 数据
+					 * EPOLLET 边缘触发：epoll_wait 只在可读状态“跃迁”时报 EPOLLIN，
+					 * 一旦触发必须循环 recv() 直到 EAGAIN 把 socket 读空；否则在第一次
+					 * recv 之后到达的字节（含 Manager 的 Ping 帧）不会再触发新的 EPOLLIN，
+					 * 帧被饿死、Ping 不回 Pong → 对端 keepalive 超时断开。
+					 */
+					for (;;) {
+						/* 检查缓冲区空间是否足够 */
+						if (client->recv_buffer_len >= client->recv_buffer_size) {
+							/* 缓冲区已满，尝试扩展 */
+							if (client->recv_buffer_size >= EZ_WS_RECV_BUFFER_MAX_SIZE) {
+								/* 已达到最大限制，关闭连接 */
+								fprintf(stderr, "[ERROR] Recv buffer reached maximum size (%d bytes). "
+								        "Client #%d from %s:%d. Cannot receive more data.\n",
+								        EZ_WS_RECV_BUFFER_MAX_SIZE,
+								        client->client_info.id, client->client_info.ip, client->client_info.port);
+								remove_client(server, client);
+								break;
+							}
+
+							/* 扩展缓冲区（每次扩展一倍，但不超过最大限制） */
+							size_t new_size = client->recv_buffer_size * 2;
+							if (new_size > EZ_WS_RECV_BUFFER_MAX_SIZE) {
+								new_size = EZ_WS_RECV_BUFFER_MAX_SIZE;
+							}
+
+							uint8_t *new_buffer = realloc(client->recv_buffer, new_size);
+							if (!new_buffer) {
+								fprintf(stderr, "[ERROR] Failed to expand recv buffer from %zu to %zu bytes. "
+								        "Client #%d from %s:%d.\n",
+								        client->recv_buffer_size, new_size,
+								        client->client_info.id, client->client_info.ip, client->client_info.port);
+								remove_client(server, client);
+								break;
+							}
+
+							client->recv_buffer = new_buffer;
+							client->recv_buffer_size = new_size;
+
+							fprintf(stderr, "[INFO] Expanded recv buffer from %zu to %zu bytes for client #%d from %s:%d.\n",
+							        client->recv_buffer_size / 2, client->recv_buffer_size,
 							        client->client_info.id, client->client_info.ip, client->client_info.port);
-							remove_client(server, client);
-							continue;
 						}
-						
-						/* 扩展缓冲区（每次扩展一倍，但不超过最大限制） */
-						size_t new_size = client->recv_buffer_size * 2;
-						if (new_size > EZ_WS_RECV_BUFFER_MAX_SIZE) {
-							new_size = EZ_WS_RECV_BUFFER_MAX_SIZE;
-						}
-						
-						uint8_t *new_buffer = realloc(client->recv_buffer, new_size);
-						if (!new_buffer) {
-							fprintf(stderr, "[ERROR] Failed to expand recv buffer from %zu to %zu bytes. "
-							        "Client #%d from %s:%d.\n",
-							        client->recv_buffer_size, new_size,
-							        client->client_info.id, client->client_info.ip, client->client_info.port);
-							remove_client(server, client);
-							continue;
-						}
-						
-						client->recv_buffer = new_buffer;
-						client->recv_buffer_size = new_size;
-						
-						fprintf(stderr, "[INFO] Expanded recv buffer from %zu to %zu bytes for client #%d from %s:%d.\n",
-						        client->recv_buffer_size / 2, client->recv_buffer_size,
-						        client->client_info.id, client->client_info.ip, client->client_info.port);
-					}
-					
-					n = recv(client->sockfd,
-					        client->recv_buffer + client->recv_buffer_len,
-					        client->recv_buffer_size - client->recv_buffer_len,
-					        0);
-					if (n < 0) {
-						if (errno == EAGAIN || errno == EWOULDBLOCK)
-							continue; /* 继续等待 */
-						remove_client(server, client);
-						continue;
-					}
-					if (n == 0) {
-						/* 连接关闭 */
-						remove_client(server, client);
-						continue;
-					}
-					
-					/* 更新接收时间 */
-					uint64_t now_ms = ez_ws_server_now_ms();
-					client->last_rx_time_ms = now_ms;
-					client->client_info.last_activity_ms = now_ms;
-					
-					/* 将接收到的数据添加到缓冲区（TCP 流式特性：数据可能分片到达） */
-					client->recv_buffer_len += n;
-					
-					/* 处理 WebSocket 数据（只处理缓冲区中的数据） */
-					/* 循环处理，直到没有完整帧可解析 */
-					while (client->recv_buffer_len > 0) {
-						size_t old_buffer_len = client->recv_buffer_len;
-						int ret = handle_websocket_data(server, client);
-						if (ret < 0) {
+
+						n = recv(client->sockfd,
+						        client->recv_buffer + client->recv_buffer_len,
+						        client->recv_buffer_size - client->recv_buffer_len,
+						        0);
+						if (n < 0) {
+							if (errno == EAGAIN || errno == EWOULDBLOCK)
+								break; /* 已读空 socket，结束 drain 等待下次 EPOLLIN */
 							remove_client(server, client);
 							break;
 						}
-						/* 如果缓冲区长度没有变化，说明没有解析任何数据，数据不完整，等待更多数据 */
-						if (client->recv_buffer_len == old_buffer_len) {
+						if (n == 0) {
+							/* 连接关闭 */
+							remove_client(server, client);
+							break;
+						}
+
+						/* 更新接收时间 */
+						uint64_t now_ms = ez_ws_server_now_ms();
+						client->last_rx_time_ms = now_ms;
+						client->client_info.last_activity_ms = now_ms;
+
+						/* 将接收到的数据添加到缓冲区（TCP 流式特性：数据可能分片到达） */
+						client->recv_buffer_len += n;
+
+						/* 处理 WebSocket 数据（只处理缓冲区中的数据） */
+						/* 循环处理，直到没有完整帧可解析 */
+						while (client->recv_buffer_len > 0) {
+							size_t old_buffer_len = client->recv_buffer_len;
+							int ret = handle_websocket_data(server, client);
+							if (ret < 0) {
+								remove_client(server, client);
+								break;
+							}
+							/* 如果缓冲区长度没有变化，说明没有解析任何数据，数据不完整，等待更多数据 */
+							if (client->recv_buffer_len == old_buffer_len) {
+								break;
+							}
+						}
+
+						/* 若解析过程中连接被关闭/状态变化，停止继续 drain */
+						if (client->state != CLIENT_STATE_CONNECTED) {
 							break;
 						}
 					}
