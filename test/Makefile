@@ -30,7 +30,7 @@ CFLAGS =	-Wall -g -O2 -MD
 CFLAGS += -D_DEBUG #debugme
 
 #include         Makefile.Defines.$(PLATFORM)
-include ../../Makefile.Defines/Makefile.Defines.$(PLATFORM)
+include ../../lazaru/Makefile.Defines/Makefile.Defines.$(PLATFORM)
 
 
 #CFLAGS += -DLINUX
@@ -38,9 +38,19 @@ CFLAGS	+= -I../src
 CFLAGS += -Wall -O2 -Os
 CFLAGS += -D_REENTRANT -msoft-float
 
+# WSS 源文件（ez_wss-*.c）需要 OpenSSL 头文件；静态链接 OpenSSL + zlib
+# （与 tutorial_libezsocket/Makefile 的 wss-*-native 目标同一套 WSS_TLS_LIBS）
+OPENSSL_INSTALL_PREFIX=$(HOME)/libs/openssl-linux
+ZLIB_INSTALL_PREFIX=$(HOME)/libs/zlib-linux
+CFLAGS += -I${OPENSSL_INSTALL_PREFIX}/include
+WSS_TLS_LIBS = $(OPENSSL_INSTALL_PREFIX)/lib64/libssl.a \
+               $(OPENSSL_INSTALL_PREFIX)/lib64/libcrypto.a \
+               $(ZLIB_INSTALL_PREFIX)/lib/libz.a -lpthread -ldl
+
 #LDFLAGS += -L../lib/\
 #	-lezthread-linux-x86-32
 EZLIBS_BASEDIR_LIBS=$(HOME)/libs
+CFLAGS += -I${EZLIBS_BASEDIR_LIBS}/include
 CFLAGS += -I${EZLIBS_BASEDIR_LIBS}/include/ezutil
 LIBS += -L${EZLIBS_BASEDIR_LIBS}/lib -lezutil-$(PLATFORM)
 
@@ -61,7 +71,11 @@ TARGET = get_pub_ip-$(PLATFORM)\
 		simple_rtsp_cli-$(PLATFORM)\
 		simple_rtsp_valid-$(PLATFORM)\
 		http_cli-$(PLATFORM)\
-		platform_chiper-$(PLATFORM)
+		platform_chiper-$(PLATFORM)\
+		t-wss-svr-bench-$(PLATFORM)\
+		t-wss-cli-bench-$(PLATFORM)\
+		t-ws-svr-bench-$(PLATFORM)\
+		t-ws-cli-bench-$(PLATFORM)
 
 # test_net_gate_way
 
@@ -82,6 +96,18 @@ simple_rtsp_valid-$(PLATFORM):simple_rtsp_valid.o $(LIB_OBJS)
 	$(CPP) -o $@ $^ $(LDFLAGS)
 http_cli-$(PLATFORM):http_cli.o $(LIB_OBJS)
 	$(CPP) -o $@ $^ $(LDFLAGS)
+
+t-wss-svr-bench-$(PLATFORM):t-wss-svr-bench.o $(LIB_OBJS)
+	$(CPP) -o $@ $^ $(LDFLAGS) $(WSS_TLS_LIBS)
+
+t-wss-cli-bench-$(PLATFORM):t-wss-cli-bench.o $(LIB_OBJS)
+	$(CPP) -o $@ $^ $(LDFLAGS) $(WSS_TLS_LIBS)
+
+t-ws-svr-bench-$(PLATFORM):t-ws-svr-bench.o $(LIB_OBJS)
+	$(CPP) -o $@ $^ $(LDFLAGS) $(WSS_TLS_LIBS)
+
+t-ws-cli-bench-$(PLATFORM):t-ws-cli-bench.o $(LIB_OBJS)
+	$(CPP) -o $@ $^ $(LDFLAGS) $(WSS_TLS_LIBS)
 
 sms_ezlibs_reg-$(PLATFORM):sms_ezlibs_reg.o $(LIB_OBJS)
 	$(CPP) -o $@ $^ $(LDFLAGS)

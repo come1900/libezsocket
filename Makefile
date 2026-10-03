@@ -34,6 +34,10 @@ include $(PREFIX_BASEDIR_SRC)/Makefile.SrcLists
 
 EZLIBS_BASEDIR_LIBS=$(HOME)/libs
 CFLAGS += -I${EZLIBS_BASEDIR_LIBS}/include
+# WSS (WebSocket over TLS) 支持：源码编译的静态 OpenSSL 头。
+# EZ_WS_ENABLE_OPENSSLTLS 默认开（见 src/ez_websocket.h）；注释该宏后
+# wss 源文件编译为空对象，本 include 行可一并移除，库不依赖 OpenSSL。
+CFLAGS += -I${HOME}/libs/openssl-linux/include
 #LIBS += -L${EZLIBS_BASEDIR_LIBS}/lib -lezutil-$(PLATFORM)
 
 PREFIX =	$(HOME)/libs

@@ -29,7 +29,9 @@ DIST =	get_pub_ip-$(PLATFORM) \
 DIST += rtp_rcv_udp-$(PLATFORM) \
 	touch-cli-native-$(PLATFORM) \
 	touch-cli-native-multi-$(PLATFORM) \
-	touch-svr-native-$(PLATFORM)
+	touch-svr-native-$(PLATFORM) \
+	wss-cli-native-$(PLATFORM) \
+	wss-svr-native-$(PLATFORM)
 
 CFLAGS =	-Wall -g -O2 -MD
 CFLAGS += -D_DEBUG #debugme
@@ -52,6 +54,14 @@ LIBS += -L${EZLIBS_BASEDIR_LIBS}/lib -lezsocket-$(PLATFORM)
 CFLAGS += -I${EZLIBS_BASEDIR_LIBS}/include/
 CFLAGS += -I${EZLIBS_BASEDIR_LIBS}/include/ezutil
 LIBS += -L${EZLIBS_BASEDIR_LIBS}/lib -lezutil-$(PLATFORM)
+
+# WSS (WebSocket over TLS) 静态链接：源码编译的 OpenSSL 3.4.1 + zlib
+# （见 3rd-openssl/tutorials/ssl-echo；仅 wss-*-native 目标使用）
+OPENSSL_INSTALL_PREFIX=$(HOME)/libs/openssl-linux
+ZLIB_INSTALL_PREFIX=$(HOME)/libs/zlib-linux
+WSS_TLS_LIBS = $(OPENSSL_INSTALL_PREFIX)/lib64/libssl.a \
+               $(OPENSSL_INSTALL_PREFIX)/lib64/libcrypto.a \
+               $(ZLIB_INSTALL_PREFIX)/lib/libz.a -lpthread -ldl
 
 LIBS += -lpthread
 
@@ -87,6 +97,10 @@ touch-cli-native-multi-$(PLATFORM):touch-cli-native-multi.o
 	$(CPP) -o $@ $^ $(LIBS)
 touch-svr-native-$(PLATFORM):touch-svr-native.o
 	$(CPP) -o $@ $^ $(LIBS)
+wss-cli-native-$(PLATFORM):wss-cli-native.o
+	$(CPP) -o $@ $^ $(LIBS) $(WSS_TLS_LIBS)
+wss-svr-native-$(PLATFORM):wss-svr-native.o
+	$(CPP) -o $@ $^ $(LIBS) $(WSS_TLS_LIBS)
 
 FILES =		*.h *.cpp Makefile*
 
